@@ -1,0 +1,3045 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chemical Substance Management System - SGA Labels</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+    
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-database-compat.js"></script>
+    <script src="auth.js"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+
+    
+    <style>
+
+
+        
+        .header-title-group {
+            display: flex;
+            align-items: center; /* Alinea verticalmente el logo y el texto */
+            gap: 15px;           /* Espacio entre el logo y el texto */
+        }
+
+        .header-title-group img {
+            height: 50px;        /* Ajusta este valor al tamaño que prefieras */
+            width: 90px;         /* Mantiene la proporción del logo */
+        }
+
+        .header-title-group h1 {
+            margin: 0;           /* Elimina márgenes por defecto para mejor alineación */
+            font-size: 20px;     /* Ajusta el tamaño de fuente a tu gusto */
+        }
+.logo-container { text-align: center; margin-bottom: 10px; }
+        .logo-subtitle { 
+            margin: 0; font-size: 0.65rem; font-weight: bold; color: #555; 
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        :root {
+            --primary-color: #575757;
+            --accent-color: #000000;
+            --bg-color: #f5f7fa;
+            --border-color: #837f7f;
+            --success-color: #10b981;
+            --Peligro-color: #dc2626;
+            --Advertencia-color: #f59e0b;
+            --audit-color: #6b7280;
+        }
+
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+            margin: 0;
+            padding: 0;
+            color: #1f2937;
+            min-height: 100vh;
+        }
+
+        h2, h3 {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 8px;
+            margin-top: 0;
+        }
+
+        .container {
+            max-width: 100%;
+            background: #ffffff;
+            padding: 10px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            margin: 20px;
+        }
+
+        /* ==================== MAIN LAUNCHER / TABS ==================== */
+        .launcher-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            border-bottom: 3px solid var(--primary-color);
+            padding-bottom: 5px;
+        }
+
+        .tab-btn {
+            background-color: #e2e8f0;
+            color: #4a5568;
+            border: none;
+            padding: 12px 24px;
+            font-size: 15px;
+            font-weight: bold;
+            border-radius: 6px 6px 0 0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab-btn:hover {
+            background-color: #cbd5e1;
+        }
+
+        .tab-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+            box-shadow: 0 -2px 6px rgba(0,0,0,0.15);
+        }
+
+        .window-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .window-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ==================== FORMULARIO LAYOUT ==================== */
+        .form-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .field label {
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 14px;
+            text-align: left;
+        }
+
+        input[type="text"], select, input[type="file"], textarea {
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        textarea {
+            resize: vertical;
+            height: 100px;
+        }
+
+        .pdf-status {
+            font-size: 12px;
+            font-weight: bold;
+            margin-top: 4px;
+            color: #7f8c8d;
+        }
+
+        .checkbox-group {
+            background: #ffffff;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+             border: 1px solid var(--border-color);
+        }
+
+        .checkbox-group p {
+            margin: 0 0 10px 0;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .flex-9-columnas {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            width: 100%;
+            box-sizing: border-box;
+             background: #9c0f0f;
+        }
+.flex-4-columnas {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+        .checkbox-item-picto {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            width: calc((100% - (10px * 8)) / 9);
+            box-sizing: border-box;
+            min-width: 80px;
+             background: #ffffff;
+        }
+
+        .checkbox-item-picto input {
+            margin: 4px 0 0 0;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            
+        }
+
+        .picto-preview-mini {
+            width: 65px;
+            height: 65px;
+            margin-bottom: 4px;
+            object-fit: contain;
+        }
+
+        .checkbox-item-area {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            width: calc((100% - (10px * 8)) / 7);
+            box-sizing: border-box;
+            min-width: 90px;
+            background: #fff;
+            padding: 6px 10px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+        }
+
+        .checkbox-item-area input {
+flex: 0 0 calc(25% - 7.5px);
+        box-sizing: border-box;
+        padding: 5px;
+        border: 1px solid #ccc; /* Opcional: para ver la matriz mejor */
+        }
+
+        .btn-submit {
+            background-color: var(--success-color);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-submit:hover {
+            background-color: #27ae60;
+        }
+        
+        .btn-cancel-edit {
+            background-color: var(--audit-color);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .alert-success {
+            display: none;
+            background-color: #d4edda;
+            color: #155724;
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        /* ==================== TABLA ESTILO EXCEL ==================== */
+        .table-container {
+            overflow-x: auto;
+            margin-top: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            text-align: center;
+        }
+
+        th, td {
+            border: 1px solid var(--border-color);
+            padding: 8px;
+            vertical-align: middle;
+        }
+
+        th {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 600;
+        }
+
+        .th-gha { background-color: #57606f; }
+        .th-sitio { background-color: #4b6584; }
+        .th-auditoria { background-color: #2c3e50; }
+
+        tr:nth-child(even) { background-color: #f9f9f9; }
+
+        .mark-x {
+            color: #a11818;
+            font-weight: bold;
+            font-size: 34px;
+        }
+        
+        .no-Peligro-text {
+            color: #7f8c8d;
+            font-style: italic;
+            font-size: 12px;
+        }
+
+        .table-picto-img {
+            width: 38px;
+            height: 38px;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .btn-action {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+            margin: 2px;
+        }
+
+        .btn-action.view-pdf { background: #9b59b6; }
+        .btn-action.btn-edit { background: #f1c40f; color: #2c3e50; }
+        .btn-action.btn-edit:hover { background: #f39c12; }
+        .btn-action.btn-delete { background: #e74c3c; }
+        .btn-action.btn-delete:hover { background: #c0392b; }
+
+        /* ==================== ESTILO DE LA ETIQUETA SGA ==================== */
+#printArea {
+ display: none;
+ position: fixed;
+ top: 50%;
+ left: 50%;
+ transform: translate(-50%, -50%);
+ z-index: 9999;
+ background: #fff;
+ padding: 20px;
+ border-radius: 8px;
+ box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+ max-height: 90vh;
+ overflow-y: auto;
+}
+
+
+        .sga-label-box {
+            width: 750px;
+            border: 3px solid #000;
+            padding: 20px;
+            background-color: #ffffff;
+            box-sizing: border-box;
+            position: relative;
+            font-family: Arial, Helvetica, sans-serif;
+            color: #000;
+            margin: 0 auto;
+        }
+
+        .sga-header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #000;
+            padding-bottom: 15px;
+            gap: 15px;
+        }
+
+        .sga-title-block {
+            flex: 1;
+        }
+
+        .sga-chemical-title {
+            background-color: #000000;
+            color: #ffffff;
+            font-size: 32px;
+            font-weight: bold;
+            padding: 6px 15px;
+            display: inline-block;
+            margin: 0 0 8px 0;
+            text-transform: uppercase;
+        }
+
+        .sga-cas-info {
+            font-size: 14px;
+            color: #333;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .sga-pictograms-container {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .sga-picto-box {
+            width: 110px;
+            height: 110px;
+            position: relative;
+            background: #fff;
+            flex-shrink: 0;
+        }
+
+        .sga-picto-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .sga-body {
+            text-align: left;
+            clear: both;
+        }
+
+        .sga-word {
+            font-size: 26px;
+            font-weight: bold;
+            margin: 0 0 15px 0;
+            letter-spacing: 1px;
+        }
+
+        .sga-section-title {
+            font-size: 14px;
+            font-weight: bold;
+            margin: 12px 0 5px 0;
+            text-decoration: underline;
+        }
+
+        .sga-text-content {
+            font-size: 13px;
+            line-height: 1.4;
+            white-space: pre-line; 
+            margin: 0 0 12px 0;
+        }
+
+        .sga-footer {
+            font-size: 10px;
+            border-top: 1px solid #666;
+            padding-top: 5px;
+            margin-top: 15px;
+            color: #444;
+        }
+
+        .label-actions-bar {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+@media print {
+
+ body * {
+  visibility: hidden;
+ }
+
+ #printArea, #printArea * {
+  visibility: visible;
+ }
+
+ #printArea {
+  position: absolute !important;
+  left: 0;
+  top: 0;
+  width: 100%;
+  transform: none !important; /* 🔥 CLAVE */
+ }
+
+ .label-actions-bar {
+  display: none;
+ }
+
+}
+
+        /* ==================== ESTILOS DE LOGIN ==================== */
+        .login-overlay {
+            display: flex;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .login-overlay.hidden {
+            display: none;
+        }
+
+        .login-card {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 380px;
+            text-align: center;
+            border-top: 5px solid #c0392b;
+        }
+
+        .login-logo {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .login-card h1 {
+            font-size: 28px;
+            color: var(--primary-color);
+            margin: 0 0 10px 0;
+            font-weight: 700;
+        }
+
+        .login-card p {
+            color: #7f8c8d;
+            margin: 0 0 25px 0;
+            font-size: 14px;
+        }
+
+        .login-input-group {
+            margin-bottom: 18px;
+            text-align: left;
+        }
+
+        .login-input-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 13px;
+        }
+
+        .login-input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+
+        .login-input-group input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .login-error {
+            display: none;
+            background-color: #fadbd8;
+            color: #c0392b;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .login-error.show {
+            display: block;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #c0392b;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .login-btn:hover {
+            background-color: #a93226;
+        }
+
+        .login-btn:active {
+            transform: scale(0.98);
+        }
+
+        .user-info-bar {
+            display: none;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            color: white;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 6px 6px 0 0;
+            margin-bottom: 15px;
+        }
+
+        .user-info-bar.active {
+            display: flex;
+        }
+
+        .user-info-bar span {
+            font-weight: 600;
+        }
+
+        .user-info-bar .user-role {
+            background: rgba(255, 255, 255, 0.3);
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        .user-info-bar header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between; /* 🔥 separa izquierda y derecha */
+    align-items: center;
+}
+.btn-out {
+    padding: 10px 18px;        /* 🔥 más espacio interno */
+    min-width: 90px;           /* evita que se haga chiquito */
+    font-size: 14px;
+    border: none;
+    border-radius: 6px;
+    background-color: gray;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+    white-space: nowrap;       /* 🔥 evita que se rompa texto */
+}
+
+
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: background 0.2s;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .admin-only, .reader-only {
+            display: none;
+        }
+
+        .admin-only.visible, .reader-only.visible {
+            display: block;
+        }
+        
+        /* Tipo badge para estados de auditoría */
+        .badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            color: white;
+            font-size: 11px;
+        }
+        .badge-create { background-color: var(--success-color); }
+        .badge-update { background-color: #f1c40f; color: #2c3e50; }
+        .badge-delete { background-color: var(--Peligro-color); }
+        @media print {
+
+  html, body {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  #printArea {
+    position: absolute !important;
+    top: 0;
+    left: 0;
+    width: 100% !important;
+    height: auto;
+    transform: none !important;
+    margin: 0;
+    padding: 0;
+  }
+
+  .sga-label-box {
+    width: 100% !important;
+    max-width: 100%;
+    box-sizing: border-box;
+    page-break-inside: avoid;
+  }
+
+}
+.icon-btn {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 18px;
+    margin: 0 2px;
+    padding: 1px;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.icon-btn:hover {
+    transform: scale(1.5);
+    opacity: 0.8;
+}
+
+/* Colores */
+.icon-btn.edit {
+    color: #f59e0b; /* amarillo */
+}
+
+.icon-btn.delete {
+    color: #dc2626; /* rojo */
+}
+
+.card-kpi {
+    padding: 15px;
+    border-radius: 8px;
+    color: white;
+    min-width: 150px;
+    text-align: center;
+}
+.card-kpi h3 {
+    color: white; /* 🔥 fuerza el número en blanco */
+    margin: 0;
+    font-size: 24px;
+}
+
+.card-kpi.blue { background: #2563eb; }   /* Total */
+.card-kpi.green { background: #10b981; }  /* Bajo */
+.card-kpi.orange { background: #f59e0b; } /* Medio */
+.card-kpi.red { background: #dc2626; }    /* Alto */
+.btn-send {
+    margin-top: 8px;
+    padding: 4px 8px;
+    font-size: 11px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    background-color: var(--accent-color);
+}
+
+.tabla-dashboard {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+
+.tabla-dashboard th,
+.tabla-dashboard td {
+    border: 1px solid #ddd;
+    padding: 6px;
+    text-align: center;
+}
+        .btn-send {
+            width: 100%; padding: 14px; background-color: gray; color: white; 
+            border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; 
+            cursor: pointer; text-transform: uppercase; transition: background-color 0.2s; margin-top: 5px;
+            
+        }
+        .btn-send:hover { background-color: rgb(170, 26, 26); }
+        #loginError {
+            display: none; color: var(--error-red); font-size: 0.85rem; 
+            margin-bottom: 15px; text-align: center; font-weight: bold;
+        }
+        .btn-out {
+            width: 20%; padding: 14px; background-color: gray; color: white; 
+            border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; 
+            cursor: pointer; text-transform: uppercase; transition: background-color 0.2s; margin-top: 5px;
+        }
+        .btn-out:hover { background-color: rgb(170, 26, 26); }
+        #loginError {
+            display: none; color: var(--error-red); font-size: 0.85rem; 
+            margin-bottom: 15px; text-align: center; font-weight: bold;
+        }
+        .campo-manual {
+    background-color: #ffffff; /* gris claro */
+}
+
+.campo-auto {
+    background-color: #dbeafe88; /* azul claro */
+}
+
+.tab-btn {
+    display: flex;
+    align-items: center;   /* ✅ centra vertical */
+    justify-content: center;
+    gap: 8px;              /* espacio entre icono y texto */
+}
+
+.tab-btn .material-icons {
+    font-size: 20px;       /* tamaño uniforme */
+    line-height: 1;
+    vertical-align: middle;
+}
+
+    </style>
+
+</head>
+<body>
+
+<div id="loginOverlay" class="login-overlay">
+    <div class="login-card">
+               <div class="logo-container">
+            <img src="logo.png" alt="HUF Logo" onerror="this.style.display='none';"></div>
+        <h1 style="color:black;">CONTROL DE SUSTANCIAS</h1>
+        <p>HOJAS Y ETIQUETAS DE SEGURIDAD</p>
+        
+        <div id="loginError" class="login-error"></div>
+        
+        <form id="loginForm" onsubmit="handleLogin(event)">
+            <div class="login-input-group">
+          <label for="loginUser" style="color:black;">USUARIO:</label>
+                <input type="text" id="loginUser" required placeholder="usuario..." autocomplete="username">
+            </div>
+            <div class="login-input-group">
+                <label for="loginPass" style="color:black;">CONTRASEÑA:</label>
+                <input type="password" id="loginPass" required placeholder="..." autocomplete="current-password">
+            </div>
+            <button type="submit" class="btn-send">ENTRAR</button>
+        </form>
+    </div>
+</div>
+
+<div id="userInfoBar" class="user-info-bar">
+    <header style="display:flex; justify-content:space-between; align-items:center;">
+
+        <!-- IZQUIERDA -->
+        <div class="header-title-group">
+            <img src="logo.png" alt="HUF Logo" onerror="this.style.display='none';">
+            <h1>HUF MX - CONTROL DE SUSTANCIAS</h1>
+        </div>
+
+        <!-- DERECHA -->
+        <div style="display:flex; align-items:center; gap:10px;">
+            <span class="user-badge-header" id="userDisplayBadge">User: Admin</span>
+            <button class="btn-out" onclick="handleLogout()">Salir</button>
+        </div>
+
+    </header>
+</div>
+
+<div class="container">
+    
+    <div class="launcher-tabs">
+        <button id="regTabBtn" class="tab-btn admin-only" onclick="switchWindow('registro-window', this)">
+            <span class="material-icons">add</span> REGISTRO
+        </button>
+
+        <button id="vizTabBtn" class="tab-btn" onclick="switchWindow('visualizacion-window', this)">
+            <span class="material-icons">grid_view</span> MATRIX
+        </button>
+
+                 <!-- <button id="bulkTabBtn" class="tab-btn admin-only" onclick="switchWindow('bulk-window', this)">
+            <span class="material-icons">download</span> IMPORTAR ( OMI)
+        </button> -->
+          
+<button id="auditTabBtn" class="tab-btn" onclick="abrirVentana('dashboard-window')">
+    <span class="material-icons">timeline</span> DASHBOARD
+</button>
+        <button id="auditTabBtn" class="tab-btn" onclick="switchWindow('auditoria-window', this)">
+           <span class="material-icons">fact_check</span> HISTORIAL
+        </button>
+
+    </div>
+
+    <div id="registro-window" class="window-content admin-only">
+        <h2 id="formFormTitle">ALTA DE SUSTANCIAS QUIMICAS</h2>
+        <div id="successAlert" class="alert-success" style="display:none;">Sustancia registrada exitosamente!</div>
+        
+        <form id="sustanciaForm">
+            <input type="hidden" id="editFirebaseKey" value="">
+            <input type="hidden" id="existingHdsUrl" value="">
+
+            <div class="form-group">
+                <div class="field">
+                    <label for="nombre">NOMBRE:</label>
+                    <input type="text" id="nombre" class="campo-manual" required placeholder="Escribe el quimico...">
+                </div>
+                <div class="field">
+                    <label for="cas">N° CAS:</label>
+                    <input type="text" id="cas" class="campo-auto" required placeholder="Ejemplo: 64-17-5">
+                </div>
+                <div class="field">
+                    <label for="presentacion">PRESENTACIÓN:</label>
+                    <input type="text" id="presentacion"class="campo-manual" required placeholder="Ejemplo:plastico">
+                </div>
+                <div class="field">
+                    <label for="palabraAdvertencia">PALABRA DE ADVERTENCIA:</label>
+                    <select id="palabraAdvertencia"class="campo-manual">
+                        <option value="Peligro">PELIGRO</option>
+                        <option value="Advertencia">ADVERTENCIA</option>
+                        <option value="Ninguno">NINGUNA (No Peligroso)</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label for="hdsFile" id="hdsLabel"class="campo-manual">CARGA (PDF):</label>
+                    <input type="file" id="hdsFile" accept=".pdf" required>
+                    
+
+
+<div id="resultadoCAS" style="margin-top:8px; font-size:13px; color:#2563eb;"></div>
+
+                    
+                    <div id="pdfStatus" class="pdf-status"></div>
+                </div>
+            </div>
+
+            <div class="form-group" style="grid-template-columns: 1fr 1fr 1fr;">
+                <div class="field">
+                    <label for="indicacionesPeligro">INDICACIONES DE PELIGRO:</label>
+                    <textarea id="indicacionesPeligro" class="campo-auto" placeholder="Informacion del PDF..."></textarea>
+                </div>
+                <div class="field">
+                    <label for="consejosPrudencia">CONSEJOS DE PRUDENCIA:</label>
+                    <textarea id="consejosPrudencia" class="campo-auto"placeholder="Informacion del PDF..."></textarea>
+                </div>
+                
+<div class="field">
+    <label for="direccionSDS">DATOS FABRICANTE/PROVEEDOR:</label>
+    <textarea id="direccionSDS"class="campo-manual" placeholder="Escribe aqui..."></textarea>
+</div>
+
+            </div>
+
+            <div class="checkbox-group">
+                <p>PICTOGRAMAS DE SEGURIDAD</p>
+                <div class="flex-9-columnas">
+                    <label class="checkbox-item-picto"><img src="1.png" class="picto-preview-mini" onerror="this.style.display='none'">1. FLAMABLE<input type="checkbox" value="Flamable" data-file="1.png" class="picto-chk"></label>
+                    <label class="checkbox-item-picto"><img src="2.png" class="picto-preview-mini" onerror="this.style.display='none'">2. CORROSIVO<input type="checkbox" value="Corrosivo" data-file="2.png" class="picto-chk"></label>
+                    <label class="checkbox-item-picto"><img src="3.png" class="picto-preview-mini" onerror="this.style.display='none'">3. OXIDANTE<input type="checkbox" value="Oxidante" data-file="3.png" class="picto-chk"></label>
+                    <label class="checkbox-item-picto"><img src="4.png" class="picto-preview-mini" onerror="this.style.display='none'">4. EXPLOSIVO<input type="checkbox" value="Explosivo" data-file="4.png" class="picto-chk"></label>
+                    <label class="checkbox-item-picto"><img src="5.png" class="picto-preview-mini" onerror="this.style.display='none'">5. IRRITANTE<input type="checkbox" value="Irritante" data-file="5.png" class="picto-chk"></label>
+                    <label class="checkbox-item-picto"><img src="6.png" class="picto-preview-mini" onerror="this.style.display='none'">6. PELIGRO SALUD<input type="checkbox" value="Peligro Salud" data-file="6.png" class="picto-chk"></label>
+                    <label class="checkbox-item-picto"><img src="7.png" class="picto-preview-mini" onerror="this.style.display='none'">7. GAS<input type="checkbox" value="Gas" data-file="7.png" class="picto-chk"></label>
+                    <label class="checkbox-item-picto"><img src="8.png" class="picto-preview-mini" onerror="this.style.display='none'">8. TOXICO<input type="checkbox" value="Toxico" data-file="8.png" class="picto-chk"></label>
+                    <label class="checkbox-item-picto"><img src="9.png" class="picto-preview-mini" onerror="this.style.display='none'">9. AMBIENTE<input type="checkbox" value="Ambiente" data-file="9.png" class="picto-chk"></label>
+                </div>
+            </div>
+
+<div class="checkbox-group">
+    <p>AREA QUE APLICA</p>
+    <div class="flex-4-columnas">
+
+        <label class="checkbox-item-area">
+            <input type="checkbox" value="Pm" class="area-chk">
+            Producción Mecánica
+        </label>
+
+        <label class="checkbox-item-area">
+            <input type="checkbox" value="MaM" class="area-chk">
+            Mantenimiento
+        </label>
+
+        <label class="checkbox-item-area">
+            <input type="checkbox" value="Pe" class="area-chk">
+            Producción Electrónica
+        </label>
+
+        <label class="checkbox-item-area">
+            <input type="checkbox" value="Mol" class="area-chk">
+            Moldes
+        </label>
+
+        <label class="checkbox-item-area">
+            <input type="checkbox" value="Iny" class="area-chk">
+            Inyección
+        </label>
+
+        <label class="checkbox-item-area">
+            <input type="checkbox" value="Lab" class="area-chk">
+            Laboratorio
+        </label>
+
+        <label class="checkbox-item-area">
+            <input type="checkbox" value="Of" class="area-chk">
+            Oficinas
+        </label>
+
+        <label class="checkbox-item-area">
+            <input type="checkbox" value="MaE" class="area-chk">
+            Mant.Electrónica
+        </label>
+
+        <label class="checkbox-item-area">
+            <input type="checkbox" value="Infr" class="area-chk">
+            Infraestructura
+        </label>
+
+        <label class="checkbox-item-area">
+            <input type="checkbox" value="Smed" class="area-chk">
+            Servicio Médico
+        </label>
+
+        <label class="checkbox-item-area">
+            <input type="checkbox" value="SMT" class="area-chk">
+            SMT
+        </label>
+
+        <label class="checkbox-item-area">
+            <input type="checkbox" value="Ar" class="area-chk">
+            Almacén Recibo
+        </label>
+
+        <label class="checkbox-item-area">
+            <input type="checkbox" value="Tc" class="area-chk">
+            Tool Crib
+        </label>
+
+        <label class="checkbox-item-area">
+            <input type="checkbox" value="Mt" class="area-chk">
+            Metrología
+        </label>
+
+    </div>
+</div>
+
+            
+<button type="submit" id="btnFormSubmit" class="btn-send" style="display:block; margin: 0 auto;">
+    CARGAR SUSTANCIA
+</button>
+<button
+    type="button" 
+    id="btnCancelEdit" 
+    class="btn-send" 
+    style="display:none; margin: 10px auto;" 
+    onclick="cancelarEdicion()">
+    Cancel
+</button>
+        </form>
+    </div>
+
+    <div id="visualizacion-window" class="window-content">
+        <h3>MATRIX DE SUSTANCIAS</h3>
+        <div style="margin-bottom:15px; display:flex; gap:10px; flex-wrap:wrap;">
+
+  <input type="text" id="filterNombre" placeholder="🔎 Nombre..." 
+    style="padding:4px; width:305px;">
+
+  <select id="filterPicto" style="width: 485px;">
+  <option value="">☣️ Todos...</option>
+  <option value="Flamable">Flamable</option>
+  <option value="Corrosivo">Corrosivo</option>
+  <option value="Oxidante">Oxidante</option>
+  <option value="Explosivo">Explosivo</option>
+  <option value="Irritante">Irritante</option>
+  <option value="Peligro Salud">Peligro Salud</option>
+  <option value="Gas">Gas</option>
+  <option value="Toxico">Toxico</option>
+  <option value="Ambiente">Ambiente</option>
+  <option value="SIN_PICTO">No peligrosas</option>
+</select>
+
+  <input type="text" id="filterCAS" placeholder="🔍 CAS..." 
+    style="padding:6px; width:315px;">
+
+<select id="filterArea" style="width: 615px;">
+    <option value="">📍 Todas las áreas</option>
+<option value="Pm">Producción Mecánica</option>
+<option value="MaM">Mantenimiento</option>
+<option value="Pe">Producción Electrónica</option>
+<option value="Mol">Moldes</option>
+<option value="Iny">Inyección</option>
+<option value="Lab">Laboratorio</option>
+<option value="Of">Oficinas</option>
+<option value="MaE">Mant.Electrónica</option>
+<option value="Infr">Infraestructura</option>
+<option value="Smed">Servicio Médico</option>
+<option value="SMT">SMT</option>
+<option value="Ar">Almacén Recibo</option>
+<option value="Tc">Tool Crib</option>
+<option value="Mt">Metrología</option>
+  </select>
+
+
+  <button onclick="limpiarFiltros()"  class="btn-send"
+    style="width: 215px;">
+    Limpiar
+  </button>
+
+</div>
+<div id="tabla" class="tab-content active">
+        <div class="table-container">
+            <table id="excelTable">
+                <thead>
+                    <tr>
+                        <th rowspan="2">No.</th>
+                        <th rowspan="2">Quimico/Sustancia</th>
+                        <th colspan="9" class="th-gha">Sistema Armonizado Global (GHS)</th>
+                        <th rowspan="2">Número CAS</th>
+                        <th rowspan="2">Presentación</th>
+                        <th colspan="14" class="th-sitio">Área en uso</th>
+                        <th rowspan="2">Etiqueta</th>
+                        <th rowspan="2">SDS</th>
+                        <th rowspan="2" class="admin-only">Actions</th>
+                    </tr>
+                    <tr>
+                        <th><img src="1.png" class="table-picto-img" onerror="this.style.display='none'"></th>
+                        <th><img src="2.png" class="table-picto-img" onerror="this.style.display='none'"></th>
+                        <th><img src="3.png" class="table-picto-img" onerror="this.style.display='none'"></th>
+                        <th><img src="4.png" class="table-picto-img" onerror="this.style.display='none'"></th>
+                        <th><img src="5.png" class="table-picto-img" onerror="this.style.display='none'"></th>
+                        <th><img src="6.png" class="table-picto-img" onerror="this.style.display='none'"></th>
+                        <th><img src="7.png" class="table-picto-img" onerror="this.style.display='none'"></th>
+                        <th><img src="8.png" class="table-picto-img" onerror="this.style.display='none'"></th>
+                        <th><img src="9.png" class="table-picto-img" onerror="this.style.display='none'"></th>
+                      <th title="Producción Mecánica">Pm</th>
+<th title="Mantenimiento">MaM</th>
+<th title="Producción Electrónica">Pe</th>
+<th title="Moldes">Mol</th>
+<th title="Inyección">Iny</th>
+<th title="Laboratorio">Lab</th>
+<th title="Oficinas">Of</th>
+<th title="Mant.Electrónica">MaE</th>
+<th title="Infraestructura">Infr</th>
+<th title="Servicio Médico">Smed</th>
+<th title="SMT">SMT</th>
+<th title="Almacén Recibo">Ar</th>
+<th title="Tool Crib">Tc</th>
+<th title="Metrología">Mt</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                </tbody>
+            </table>
+        </div>
+        </div>
+        
+    </div>
+
+    <div id="auditoria-window" class="window-content">
+        <h3>HISTORIAL DE AUDITORIA</h3>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th class="th-auditoria">FECHA</th>
+                        <th class="th-auditoria">USUARIO</th>
+                        <th class="th-auditoria">ACCION</th>
+                        <th class="th-auditoria">NOMBRE DE LA SUSTANCIA</th>
+                        <th class="th-auditoria">NUMERO CAS</th>
+                        <th class="th-auditoria">DETALLES / CAMBIOS</th>
+                    </tr>
+                </thead>
+                <tbody id="auditTableBody">
+                    <tr>
+                        <td colspan="6" style="color:#7f8c8d; font-style:italic;">SIN HISTORIAL</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+        </div>
+    </div>
+    
+
+    <div id="bulk-window" class="window-content admin-only">
+        <h3>SOLO PARA DESARROLLO OMI</h3>
+        
+<div class="field" style="margin-top:10px;">
+  <label>SELECCIONAR FOLDER PARA PDF</label>
+  <input type="file" id="bulkPdfFolder" webkitdirectory multiple accept=".pdf">
+  
+</div>
+
+       
+        <div class="field">
+            <label for="excelFile">SELECCIONAR BASE DE DATOS </label>
+            <input type="file" id="excelFile" accept=".xlsx,.xls,.csv">
+        </div>
+
+        <div style="margin-top:12px;">
+              <button id="btnUploadPDFs" class="btn-send">
+    CARGAR PDF'S
+  </button>
+            <button id="btnParseExcel" class="btn-send">CARGAR BASE DE DATOS</button>
+        </div>
+        <div style="margin-top:10px;">
+
+</div>
+
+
+        <div id="bulkPreviewContainer" style="margin-top:16px;"></div>
+    </div>
+
+    <div id="dashboard-window" class="window-content" style="display:none;">
+    
+    <h3>Dashboard de Riesgo</h3>
+
+    <!-- KPIs -->
+<div style="display:flex; gap:20px; flex-wrap:wrap; margin-bottom:15px;">
+
+   <div class="card-kpi blue">
+    <h3 id="kpiTotal">0</h3>
+    <p>Total Sustancias</p>
+    <button onclick="filtrarDashboard('total')" class="btn-send">Ver</button>
+</div>
+
+<div class="card-kpi green">
+    <h3 id="kpiBajo">0</h3>
+    <p>Riesgo Bajo</p>
+    <button onclick="filtrarDashboard('bajo')" class="btn-send">Ver</button>
+</div>
+
+<div class="card-kpi orange">
+    <h3 id="kpiMedio">0</h3>
+    <p>Riesgo Medio</p>
+    <button onclick="filtrarDashboard('medio')" class="btn-send">Ver</button>
+</div>
+
+<div class="card-kpi red">
+    <h3 id="kpiAlto">0</h3>
+    <p>Riesgo Alto</p>
+    <button onclick="filtrarDashboard('alto')" class="btn-send">Ver</button>
+</div>
+
+</div>
+
+    <!-- Gráfica + Top -->
+<div style="display:flex; gap:20px;">
+
+    <!-- IZQUIERDA -->
+    <div>
+        <div style="width:250px; height:250px;">
+            <canvas id="graficaRiesgo"></canvas>
+        </div>
+
+        <h4> Top Sustancias Peligrosas</h4>
+        <ul id="topPeligrosas"></ul>
+    </div>
+<div style="margin-top:25px; display:flex; gap:20px; flex-wrap:wrap;">
+
+    <!-- 🏭 TOP ÁREAS -->
+    <div style="flex:1; min-width:200px;">
+        <h4> Áreas más peligrosas</h4>
+        <ul id="topAreas"></ul>
+    </div>
+
+    <!--  PICTOGRAMAS -->
+    <div style="flex:1; min-width:200px;">
+        <h4> Tipo de riesgo dominante</h4>
+        <ul id="topPictos"></ul>
+    </div>
+
+    <!-- 📊 INDICADORES -->
+
+
+</div>
+    <!-- DERECHA (TABLA DINÁMICA) -->
+    <div style="flex:1;">
+        <h4 id="tituloTablaDashboard">Resultados</h4>
+        <table class="tabla-dashboard">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Nombre</th>
+                    <th>Riesgo</th>
+                </tr>
+            </thead>
+            <tbody id="tablaDashboardBody"></tbody>
+        </table>
+    </div>
+
+</div>
+</div>
+
+
+    <div id="printArea">
+        <div class="sga-label-box">
+            <div class="sga-header-container">
+                <div class="sga-title-block">
+                    <h1 class="sga-chemical-title" id="lblNombre">ALCOHOL ETÍLICO</h1>
+                    <p class="sga-cas-info" id="lblCasInfo">CAS: 64-17-5</p>
+                </div>
+                <div class="sga-pictograms-container" id="lblPictogramasContenedor"></div>
+            </div>
+
+            <div class="sga-body">
+                <div class="sga-word" id="lblPalabra">PELIGRO</div>
+                
+                <div class="sga-section-title">INDICACIONES DE PELIGRO</div>
+                <div class="sga-text-content" id="lblIndicaciones"></div>
+                
+                <div class="sga-section-title">CONSEJOS DE PRUDENCIA</div>
+                <div class="sga-text-content" id="lblConsejos"></div>
+            </div>
+
+        <div class="sga-footer" id="lblDireccion">
+</div>
+        </div>
+        <div class="label-actions-bar">
+            <!-- <button class="btn-action" style="background:#10b981; padding: 10px 20px;" onclick="window.print()">Print Label</button> -->
+            <button class="btn-action" style="background:#6b7280; padding: 10px 20px;" onclick="cerrarEtiqueta()">Close</button>
+        </div>
+    </div>
+
+
+</div>
+
+<script>
+    
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+
+    // Inicialización de Firebase con la base de datos especificada
+    const firebaseConfig = { databaseURL: "https://sustanciasquimicas-1c7cd-default-rtdb.firebaseio.com/" };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    let listaSustancias = [];
+    
+let filtroNombre = '';
+let filtroCAS = '';
+let filtroArea = '';
+
+
+document.getElementById('filterNombre').addEventListener('input', function() {
+  filtroNombre = this.value.toLowerCase();
+  actualizarTabla();
+  actualizarDashboard();
+});
+document.getElementById('filterPicto').addEventListener('change', actualizarTabla);
+
+
+document.getElementById('filterCAS').addEventListener('input', function() {
+  filtroCAS = this.value.toLowerCase();
+  actualizarTabla();
+  actualizarDashboard();
+});
+
+document.getElementById('filterArea').addEventListener('change', function() {
+  filtroArea = this.value;
+  actualizarTabla();
+  actualizarDashboard();
+});
+
+const mapaPictos = {
+    Flammable: "Inflamable",
+    Explosive: "Explosivo",
+    Skull: "Tóxico",
+    Corrosive: "Corrosivo",
+    Gas: "Gas a presión",
+    Health: "Peligro a la salud",
+    HealthHazard: "Peligro a la salud",
+    Irritant: "Irritante",
+    Environment: "Peligro ambiental"
+};
+
+
+    const totalPictogramas = [
+        { id: "Flamable", file: "1.png" },
+        { id: "Corrosivo", file: "2.png" },
+        { id: "Oxidante", file: "3.png" },
+        { id: "Explosivo", file: "4.png" },
+        { id: "Irritante", file: "5.png" },
+        { id: "Peligro Salud", file: "6.png" },
+        { id: "Gas", file: "7.png" },
+        { id: "Toxico", file: "8.png" },
+        { id: "Ambiente", file: "9.png" }
+    ];
+    
+    const totalAreas = ["Pm", "MaM", "Pe", "Mol", "Iny", "Lab", "Of", "MaE", "Infr", "Smed", "SMT", "Ar", "Tc", "Mt"];
+
+    function switchWindow(windowId, button) {
+        document.querySelectorAll('.window-content').forEach(win => win.style.display = 'none');
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        
+        document.getElementById(windowId).style.display = 'block';
+        button.classList.add('active');
+
+        if(windowId === 'registro-window') {
+            cerrarEtiqueta();
+        }
+    }
+
+    // Lector local de PDFs para evitar conflictos CORS
+    document.getElementById('hdsFile').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        const statusDiv = document.getElementById('pdfStatus');
+        
+        if (!file || file.type !== "application/pdf") return;
+
+       
+
+        const fileReader = new FileReader();
+        fileReader.onload = function() {
+            const typedarray = new Uint8Array(this.result);
+
+            pdfjsLib.getDocument(typedarray).promise.then(function(pdf) {
+                let maxPages = pdf.numPages;
+                let countPromises = [];
+
+                for (let i = 1; i <= maxPages; i++) {
+                    countPromises.push(
+                        pdf.getPage(i).then(function(page) {
+                            return page.getTextContent().then(function(textContent) {
+                                return textContent.items.map(item => item.str).join(' ');
+                            });
+                        })
+                    );
+                }
+
+                Promise.all(countPromises).then(function(pageTexts) {
+                    let fullText = pageTexts.join(' \n ');
+                    const masterRegex = /([HP]\d{3}(?:\s*\+\s*[HP]\d{3})*[A-Z]?)\s+([\s\S]+?)(?=(?:[HP]\d{3}|\bSECCIÓN\b|\bINDICACIONES\b|\bCONSEJOS\b|$))/gi;
+
+                    let frasesH = [];
+                    let frasesP = [];
+                    let numerosCAS = [];
+                    let match;
+
+                    const casRegex = /\b(\d{1,7}-\d{1,5}-\d{1})\b/g;
+                    let casMatch;
+                    while ((casMatch = casRegex.exec(fullText)) !== null) {
+                        const casNumber = casMatch[1];
+                        if (!numerosCAS.includes(casNumber)) {
+                            numerosCAS.push(casNumber);
+                        }
+                    }
+
+                    while ((match = masterRegex.exec(fullText)) !== null) {
+                        let codigo = match[1].toUpperCase().replace(/\s+/g, ' ');
+                        let descripcion = match[2].trim();
+
+                        if (descripcion.length < 5 || descripcion.includes("Página:")) continue;
+
+                        descripcion = descripcion.replace(/\b(Prevención|Respuesta|Desecho|Almacenamiento|Eliminación):/gi, '');
+                        descripcion = descripcion.replace(/\s+/g, ' ').trim();
+                        
+                        if (!descripcion.endsWith('.')) descripcion += '.';
+                        
+                        const fraseFormateada = `${codigo} ${descripcion}`;
+
+                        if (codigo.startsWith('H')) {
+                            if (!frasesH.includes(fraseFormateada)) frasesH.push(fraseFormateada);
+                        } else if (codigo.startsWith('P')) {
+                            if (!frasesP.includes(fraseFormateada)) frasesP.push(fraseFormateada);
+                        }
+                    }
+
+                    // if (numerosCAS.length > 0) {
+                    //     document.getElementById('cas').value = numerosCAS[0];
+                    // }
+
+                    document.getElementById('indicacionesPeligro').value = frasesH.join('\n');
+                    document.getElementById('consejosPrudencia').value = frasesP.join('\n');
+
+                    if (frasesH.length > 0 || frasesP.length > 0) {
+                        statusDiv.style.color = "#10b981";
+                        
+                    } else {
+                       
+                    }
+
+                });
+            }).catch(function(err) {
+                statusDiv.innerText = "❌ Technical error processing PDF file.";
+                statusDiv.style.color = "#dc2626";
+                console.error(err);
+            });
+        };
+        fileReader.readAsArrayBuffer(file);
+        
+    });
+
+    // Escuchador en tiempo real de Firebase para mantener la matriz sincronizada
+    db.ref("sustancias").on("value", (snapshot) => {
+        listaSustancias = [];
+        if (snapshot.exists()) {
+            snapshot.forEach((childSnapshot) => {
+                const sustancia = childSnapshot.val();
+                sustancia.firebaseKey = childSnapshot.key; 
+                listaSustancias.push(sustancia);
+            });
+        }
+        actualizarTabla();
+        actualizarDashboard();
+    });
+
+    // Escuchador en tiempo real para la Auditoría
+    db.ref("auditoria").on("value", (snapshot) => {
+        const tbodyAudit = document.getElementById('auditTableBody');
+        tbodyAudit.innerHTML = "";
+
+        if (snapshot.exists()) {
+            let logs = [];
+            snapshot.forEach((childSnapshot) => {
+                logs.unshift({ ...childSnapshot.val(), key: childSnapshot.key }); // Los más recientes arriba
+            });
+
+            logs.forEach(log => {
+                const tr = document.createElement('tr');
+                let badgeClass = "badge-create";
+                if(log.accion === "MODIFICACIÓN") badgeClass = "badge-update";
+                if(log.accion === "ELIMINACIÓN") badgeClass = "badge-delete";
+
+                tr.innerHTML = `
+                    <td style="font-family: monospace;">${log.timestamp}</td>
+                    <td style="font-weight: 600;">${log.usuario}</td>
+                    <td><span class="badge ${badgeClass}">${log.accion}</span></td>
+                    <td style="text-align: left; font-weight: bold;">${log.sustancia}</td>
+                    <td style="font-family: monospace;">${log.cas}</td>
+                    <td style="text-align: left; font-size: 12px; max-width: 300px; white-space: pre-wrap;">${log.detalles}</td>
+                `;
+                tbodyAudit.appendChild(tr);
+            });
+        } else {
+            tbodyAudit.innerHTML = `<tr><td colspan="6" style="color:#7f8c8d; font-style:italic;">No log entries found.</td></tr>`;
+        }
+    });
+
+    // Registrar o actualizar sustancia
+    document.getElementById('sustanciaForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const currentUser = obtenerUsuarioActual();
+        const username = currentUser ? currentUser.user : "unknown_user";
+
+        const editKey = document.getElementById('editFirebaseKey').value;
+        const nombre = document.getElementById('nombre').value;
+        const cas = document.getElementById('cas').value;
+        const presentacion = document.getElementById('presentacion').value;
+        const palabra = document.getElementById('palabraAdvertencia').value;
+        const indicaciones = document.getElementById('indicacionesPeligro').value;
+        const consejos = document.getElementById('consejosPrudencia').value;
+        const fileInput = document.getElementById('hdsFile');
+        const existingHdsUrl = document.getElementById('existingHdsUrl').value || "#";
+
+        const pictogramasSeleccionados = Array.from(document.querySelectorAll('.picto-chk:checked')).map(cb => {
+            return { id: cb.value, fileName: cb.getAttribute('data-file') };
+        });
+        
+        const areasSeleccionadas = Array.from(document.querySelectorAll('.area-chk:checked')).map(cb => cb.value);
+
+        const timestampStr = new Date().toLocaleString();
+
+        const guardarSustancia = (hdsUrl) => {
+// 🧠 Obtener registro existente (si es edición)
+const registroExistente = listaSustancias.find(s => s.firebaseKey === editKey);
+
+// 📅 Fecha SOLO si hay PDF nuevo
+let pdfFechaFinal = "";
+
+// ✅ CASO 1: Se sube archivo nuevo → actualizar fecha
+if (fileInput.files.length > 0) {
+    const ahora = new Date();
+    pdfFechaFinal = ahora.toLocaleDateString('es-MX', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+    });
+} 
+// ✅ CASO 2: NO se sube PDF → conservar fecha anterior
+else if (registroExistente && registroExistente.pdfFecha) {
+    pdfFechaFinal = registroExistente.pdfFecha;
+}
+
+const registroSustancia = {
+    id: listaSustancias.length + 1,
+    nombre: nombre,
+    cas: cas,
+    presentacion: presentacion,
+    palabra: palabra,
+    indicaciones: indicaciones,
+    consejos: consejos,
+    pictograms: pictogramasSeleccionados,
+    areas: areasSeleccionadas,
+    hdsUrl: hdsUrl,
+    pdfFecha: pdfFechaFinal,
+    direccion: document.getElementById('direccionSDS').value,
+
+};
+
+            if (fileInput.files.length > 0) {
+                registroSustancia.pdfBase64 = hdsUrl;
+            }
+
+            if (editKey) {
+                // ==================== MODO EDICIÓN ====================
+                registroSustancia.id = listaSustancias.find(s => s.firebaseKey === editKey)?.id || registroSustancia.id;
+
+                db.ref("sustancias/" + editKey).set(registroSustancia)
+                    .then(() => {
+                        // Crear registro en auditoría
+                        db.ref("auditoria").push({
+                            timestamp: timestampStr,
+                            usuario: username,
+                            accion: "MODIFICACIÓN",
+                            sustancia: nombre,
+                            cas: cas,
+                            detalles: `Campos actualizados. Presentación: ${presentacion}. Áreas asignadas: [${areasSeleccionadas.join(', ')}].`
+                        });
+
+                        cancelarEdicion();
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Substance Updated',
+                            text: 'Changes saved permanently to Firebase!',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                    });
+            } else {
+                // ==================== MODO NUEVA ALTA ====================
+                db.ref("sustancias").push(registroSustancia)
+                    .then(() => {
+                        // Crear registro en auditoría
+                        db.ref("auditoria").push({
+                            timestamp: timestampStr,
+                            usuario: username,
+                            accion: "ALTA",
+                            sustancia: nombre,
+                            cas: cas,
+                            detalles: `Registro inicial de sustancia. Palabra de advertencia: ${palabra}.`
+                        });
+
+                        document.getElementById('sustanciaForm').reset();
+                        document.getElementById('pdfStatus').innerText = ""; 
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Substance Registered',
+                            text: 'The substance has been successfully added to Firebase!',
+                            timer: 2500,
+                            timerProgressBar: true,
+                            showConfirmButton: false
+                        });
+                    })
+                    .catch((error) => {
+                        console.error("Error saving to Firebase:", error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Storage Error',
+                            text: 'Could not upload data to Firebase Database.',
+                            confirmButtonColor: '#dc2626'
+                        });
+                    });
+            }
+        };
+
+        if (fileInput.files.length > 0) {
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const base64Data = event.target.result;
+                guardarSustancia(base64Data);
+            };
+            reader.onerror = function(err) {
+                console.error('Error reading PDF file:', err);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'PDF Error',
+                    text: 'Unable to read the selected PDF file. Please try again.',
+                    confirmButtonColor: '#dc2626'
+                });
+            };
+            reader.readAsDataURL(file);
+        } else {
+            guardarSustancia(existingHdsUrl);
+        }
+    });
+function obtenerColorFecha(fechaStr) {
+    if (!fechaStr) return "#7f8c8d"; // gris si no hay fecha
+
+    // Convertir DD/MM/YYYY a Date
+    const partes = fechaStr.split('/');
+    if (partes.length !== 3) return "#7f8c8d";
+
+    const fecha = new Date(partes[2], partes[1] - 1, partes[0]);
+    const hoy = new Date();
+
+    const diffTime = hoy - fecha;
+    const diffDias = diffTime / (1000 * 60 * 60 * 24);
+
+    if (diffDias <= 30) return "#16a34a";     // verde
+    if (diffDias <= 180) return "#f59e0b";    // amarillo
+    return "#dc2626";                         // rojo
+}
+
+const mapaAreas = {
+    Pm: "Producción Mecánica",
+    MaM: "Mantenimiento",
+    Pe: "Producción Electrónica",
+    Mol: "Moldes",
+    Iny: "Inyección",
+    Lab: "Laboratorio",
+    Of: "Oficinas",
+    MaE: "Mant.Electrónica",
+    Infr: "Infraestructura",
+    Smed: "Servicio Médico",
+    SMT: "SMT",
+    Ar: "Almacén Recibo",
+    Tc: "Tool Crib",
+    Mt: "Metrología"
+};
+
+function actualizarTabla() {
+
+    const tbody = document.getElementById('tableBody');
+    tbody.innerHTML = "";
+
+    const usuario = obtenerUsuarioActual();
+    const esAdmin = usuario && usuario.rol === 'admin';
+
+    // ✅ LEER FILTROS
+    const nombreFiltro = document.getElementById('filterNombre')?.value.toLowerCase() || '';
+    const casFiltro = document.getElementById('filterCAS')?.value.toLowerCase() || '';
+    const areaFiltro = document.getElementById('filterArea')?.value || '';
+    const pictoFiltro = document.getElementById('filterPicto')?.value || '';
+
+    // ✅ FILTRAR DATOS
+    const filtradas = listaSustancias.filter(s => {
+
+        const nombreOK = !nombreFiltro || 
+            (
+              (s.nombre && s.nombre.toLowerCase().includes(nombreFiltro)) ||
+              (s.presentacion && s.presentacion.toLowerCase().includes(nombreFiltro))
+            );
+
+        const casOK = !casFiltro || 
+            (s.cas && s.cas.toLowerCase().includes(casFiltro));
+
+        const areaOK = !areaFiltro || 
+            (s.areas && s.areas.includes(areaFiltro));
+
+let pictogramaOK = true;
+
+if (pictoFiltro === "SIN_PICTO") {
+  pictogramaOK = !s.pictograms || s.pictograms.length === 0;
+} else if (pictoFiltro) {
+  pictogramaOK = s.pictograms && s.pictograms.some(p => p.id === pictoFiltro);
+}
+
+        return nombreOK && casOK && areaOK && pictogramaOK;
+    });
+
+    // ✅ FUNCIÓN COLOR POR ANTIGÜEDAD
+    function obtenerColorFecha(fechaStr) {
+        if (!fechaStr) return "#7f8c8d";
+
+        const partes = fechaStr.split('/');
+        if (partes.length !== 3) return "#7f8c8d";
+
+        const fecha = new Date(partes[2], partes[1] - 1, partes[0]);
+        const hoy = new Date();
+
+        const diffDias = (hoy - fecha) / (1000 * 60 * 60 * 24);
+
+        if (diffDias <= 30) return "#16a34a";   // Verde
+        if (diffDias <= 180) return "#f59e0b";  // Amarillo
+        return "#dc2626";                       // Rojo
+    }
+
+    // ✅ PINTAR TABLA
+    filtradas.forEach((sustancia, index) => {
+
+        const tr = document.createElement('tr');
+
+        let htmlContenido = `
+            <td>${index + 1}</td>
+            <td style="text-align: left; font-weight: bold;">
+                ${sustancia.nombre}
+            </td>
+        `;
+
+        if (sustancia.palabra === "Ninguno" && (!sustancia.pictograms || sustancia.pictograms.length === 0)) {
+            htmlContenido += `
+                <td colspan="9" class="no-Peligro-text">
+                    No reúne los criterios para ser clasificada como peligrosa
+                </td>
+            `;
+        } else {
+            totalPictogramas.forEach(p => {
+                const tienePicto = (sustancia.pictograms && sustancia.pictograms.some(item => item.id === p.id))
+                    ? '<span class="mark-x">●</span>' : '';
+                htmlContenido += `<td>${tienePicto}</td>`;
+            });
+        }
+
+        htmlContenido += `
+            <td style="color: #2980b9; font-weight: bold; white-space: pre-line;">
+                ${sustancia.cas}
+            </td>
+            <td>${sustancia.presentacion}</td>
+        `;
+
+        totalAreas.forEach(a => {
+            const tieneArea = (sustancia.areas && sustancia.areas.includes(a))
+                ? '<span class="mark-x">●</span>' : '';
+            htmlContenido += `<td>${tieneArea}</td>`;
+        });
+
+const btnEtiqueta = (sustancia.palabra === "Ninguno" && (!sustancia.pictograms || sustancia.pictograms.length === 0))
+    ? `<td><span style="color:#7f8c8d;">N/A</span></td>`
+    : `
+        <td>
+            <button class="icon-btn label" title="Ver etiqueta"
+                onclick="generarEtiqueta('${sustancia.firebaseKey}')"
+                style="flex-direction: column;">
+                <span class="material-icons">label</span>
+                <span class="icon-text">View</span>
+            </button>
+        </td>
+      `;
+
+        // 🎯 COLOR DINÁMICO DE FECHA
+        const colorFecha = obtenerColorFecha(sustancia.pdfFecha);
+
+        htmlContenido += `
+            ${btnEtiqueta}
+<td>
+  <a href="#" 
+    data-hds="${sustancia.hdsUrl || '#'}"
+    data-pdf="${sustancia.pdfBase64 || ''}"
+    class="icon-btn sds view-sds"
+    title="Ver hoja de seguridad"
+    style="flex-direction: column;"
+  >
+    <span class="material-icons">description</span>
+    <span class="icon-text">SDS</span>
+  </a>
+
+  <!-- ✅ FECHA -->
+  <div style="font-size:10px; margin-top:4px; color:#6b7280;">
+    ${sustancia.pdfFecha || ""}
+  </div>
+</td>
+        `;
+
+        // ✅ ADMIN
+        if (esAdmin) {
+            htmlContenido += `
+<td style="white-space: nowrap;">
+    <button class="icon-btn edit" title="Editar"
+        onclick="cargarDatosEdicion('${sustancia.firebaseKey}')">
+        <span class="material-icons">edit</span>
+    </button>
+
+    <button class="icon-btn delete" title="Eliminar"
+        onclick="eliminarSustancia('${sustancia.firebaseKey}', '${sustancia.nombre}', '${sustancia.cas}')">
+        <span class="material-icons">delete</span>
+    </button>
+</td>
+
+            `;
+        } else {
+            htmlContenido += `<td class="admin-only"></td>`;
+        }
+
+        tr.innerHTML = htmlContenido;
+        tbody.appendChild(tr);
+    });
+
+    controlarAccesoPorRol(usuario ? usuario.rol : '');
+}
+    
+
+function obtenerEtiquetaFecha(fechaStr) {
+    if (!fechaStr) return "Sin fecha";
+
+    const partes = fechaStr.split('/');
+    const fecha = new Date(partes[2], partes[1] - 1, partes[0]);
+    const hoy = new Date();
+
+    const diffDias = (hoy - fecha) / (1000 * 60 * 60 * 24);
+
+    if (diffDias <= 30) return "Vigente";
+    if (diffDias <= 180) return "Revisar";
+    return "Obsoleto";
+}
+
+// Cargar datos en el formulario para editar
+    function cargarDatosEdicion(firebaseKey) {
+        const sustancia = listaSustancias.find(s => s.firebaseKey === firebaseKey);
+        if(!sustancia) return;
+
+        // Cambiar títulos e interfaz
+        document.getElementById('formFormTitle').innerText = "✏️ Edit Substance: " + sustancia.nombre;
+        document.getElementById('btnFormSubmit').innerText = "Update Substance";
+        document.getElementById('btnFormSubmit').style.backgroundColor = "var(--Advertencia-color)";
+        document.getElementById('btnCancelEdit').style.display = "block";
+
+        // Asignar llaves ocultas
+        document.getElementById('editFirebaseKey').value = firebaseKey;
+        document.getElementById('existingHdsUrl').value = sustancia.hdsUrl;
+
+        // Llenar campos de texto
+        document.getElementById('nombre').value = sustancia.nombre;
+        document.getElementById('cas').value = sustancia.cas;
+        document.getElementById('presentacion').value = sustancia.presentacion;
+        document.getElementById('palabraAdvertencia').value = sustancia.palabra;
+        document.getElementById('indicacionesPeligro').value = sustancia.indicaciones || "";
+        document.getElementById('consejosPrudencia').value = sustancia.consejos || "";
+        document.getElementById('direccionSDS').value = sustancia.direccion || "";
+
+        // Quitar la obligación del archivo PDF (file input) porque ya existe uno guardado
+        document.getElementById('hdsFile').required = false;
+        document.getElementById('hdsLabel').innerText = "Update SDS (PDF) [Optional]:";
+      
+        document.getElementById('pdfStatus').style.color = "var(--accent-color)";
+
+        // Limpiar y re-marcar checkboxes de pictogramas
+        document.querySelectorAll('.picto-chk').forEach(cb => cb.checked = false);
+        if(sustancia.pictograms) {
+            sustancia.pictograms.forEach(p => {
+                const cb = Array.from(document.querySelectorAll('.picto-chk')).find(c => c.value === p.id);
+                if(cb) cb.checked = true;
+            });
+        }
+
+        // Limpiar y re-marcar checkboxes de áreas
+        document.querySelectorAll('.area-chk').forEach(cb => cb.checked = false);
+        if(sustancia.areas) {
+            sustancia.areas.forEach(a => {
+                const cb = Array.from(document.querySelectorAll('.area-chk')).find(c => c.value === a);
+                if(cb) cb.checked = true;
+            });
+        }
+
+        // Redirigir a ventana de formulario
+        const regBtn = document.getElementById('regTabBtn');
+        switchWindow('registro-window', regBtn);
+    }
+
+    function cancelarEdicion() {
+        document.getElementById('sustanciaForm').reset();
+        document.getElementById('editFirebaseKey').value = "";
+        document.getElementById('existingHdsUrl').value = "";
+        
+        document.getElementById('formFormTitle').innerText = "Chemical Substance Registration";
+        document.getElementById('btnFormSubmit').innerText = "CARGAR SUSTANCIA";
+        document.getElementById('btnFormSubmit').style.backgroundColor = "var(--success-color)";
+        document.getElementById('btnCancelEdit').style.display = "none";
+        
+        document.getElementById('hdsFile').required = true;
+        document.getElementById('hdsLabel').innerText = "Upload SDS (PDF):";
+        document.getElementById('pdfStatus').innerText = "";
+
+        const vizBtn = document.getElementById('vizTabBtn');
+        switchWindow('visualizacion-window', vizBtn);
+    }
+
+    // Eliminar sustancia de Firebase de forma lógica/física con reporte de auditoría
+    function eliminarSustancia(firebaseKey, nombreSustancia, casSustancia) {
+        const currentUser = obtenerUsuarioActual();
+        const username = currentUser ? currentUser.user : "unknown_user";
+
+        Swal.fire({
+            title: 'Are you sure?',
+            text: `You are about to delete "${nombreSustancia}". This action cannot be undone!`,
+            icon: 'Advertencia',
+            showCancelButton: true,
+            confirmButtonColor: 'var(--Peligro-color)',
+            cancelButtonColor: 'var(--audit-color)',
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                db.ref("sustancias/" + firebaseKey).remove()
+                    .then(() => {
+                        const timestampStr = new Date().toLocaleString();
+                        
+                        // Crear registro persistente en auditoría
+                        db.ref("auditoria").push({
+                            timestamp: timestampStr,
+                            usuario: username,
+                            accion: "ELIMINACIÓN",
+                            sustancia: nombreSustancia,
+                            cas: casSustancia,
+                            detalles: "Remoción permanente del inventario activo por el administrador."
+                        });
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Deleted!',
+                            text: 'The substance has been successfully removed.',
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
+                    })
+                    .catch(error => {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Could not remove the substance from database.'
+                        });
+                    });
+            }
+        });
+    }
+
+    function generarEtiqueta(firebaseKey) {
+        const sustancia = listaSustancias.find(s => s.firebaseKey === firebaseKey);
+        if(!sustancia) return;
+
+        document.getElementById('lblNombre').innerText = sustancia.nombre;
+        document.getElementById('lblCasInfo').innerText = "CAS: " + sustancia.cas;
+        document.getElementById('lblPalabra').innerText = sustancia.palabra === "Ninguno" ? "" : sustancia.palabra;
+        document.getElementById('lblIndicaciones').innerText = sustancia.indicaciones || "No specific hazard statements.";
+        document.getElementById('lblConsejos').innerText = sustancia.consejos || "No specific precautionary measures.";
+        document.getElementById('lblDireccion').innerText =
+    sustancia.direccion || "SIN DIRECCIÓN";
+
+        const pictoContenedor = document.getElementById('lblPictogramasContenedor');
+        pictoContenedor.innerHTML = ""; 
+
+        if (sustancia.pictograms && sustancia.pictograms.length > 0) {
+            sustancia.pictograms.forEach(picto => {
+                const box = document.createElement('div');
+                box.className = "sga-picto-box";
+                
+                const img = document.createElement('img');
+                img.src = picto.fileName; 
+                img.alt = picto.id;
+                
+                box.appendChild(img);
+                pictoContenedor.appendChild(box);
+            });
+        }
+        
+        const area = document.getElementById('printArea');
+        area.style.display = "block";
+       
+    }
+
+    function cerrarEtiqueta() {
+        document.getElementById('printArea').style.display = "none";
+    }
+
+    // ==================== SISTEMA DE AUTENTICACIÓN ====================
+    async function handleLogin(event) {
+    event.preventDefault();
+
+    const usuario = document.getElementById('loginUser').value;
+    const password = document.getElementById('loginPass').value;
+
+    try {
+        const res = await fetch("usuarios.json");
+        const usuariosRegistrados = await res.json();
+
+        const usuarioValido = usuariosRegistrados.find(u =>
+            u.user === usuario && u.pass === password
+        );
+
+        if (usuarioValido) {
+
+            localStorage.setItem('usuarioActual', JSON.stringify({
+                user: usuarioValido.user,
+                rol: usuarioValido.rol,
+                loginTime: new Date().getTime()
+            }));
+
+            mostrarAplicacion();
+
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Login Failed',
+                text: 'Usuario o contraseña incorrectos'
+            });
+        }
+
+    } catch (err) {
+        console.error("Error cargando usuarios:", err);
+    }
+}
+
+    
+    function handleLogout() {
+
+                localStorage.removeItem('usuarioActual');
+                mostrarLogin();
+
+            }
+      
+       
+    function obtenerUsuarioActual() {
+        const sesion = localStorage.getItem('usuarioActual');
+        if (sesion) {
+            try {
+                return JSON.parse(sesion);
+            } catch (e) {
+                return null;
+            }
+        }
+        return null;
+    }
+    
+    function mostrarLogin() {
+        document.getElementById('loginOverlay').classList.remove('hidden');
+        document.getElementById('userInfoBar').classList.remove('active');
+        document.querySelector('.container').style.display = 'none';
+    }
+    
+    function mostrarAplicacion() {
+        const usuario = obtenerUsuarioActual();
+        
+        if (usuario) {
+            document.getElementById('loginOverlay').classList.add('hidden');
+            document.getElementById('userInfoBar').classList.add('active');
+            document.querySelector('.container').style.display = 'block';
+            
+       const badge = document.getElementById('userDisplayBadge');
+
+if (badge) {
+    const rolTexto = usuario.rol === 'admin'
+        ? '👤'
+        : '👁️ ';
+
+    badge.textContent = `${usuario.user} | ${rolTexto}`;
+}
+
+            
+            controlarAccesoPorRol(usuario.rol);
+        }
+    }
+    
+    function controlarAccesoPorRol(rol) {
+        const esAdmin = rol === 'admin';
+        const esLector = rol === 'lector';
+        
+        const elementosAdmin = document.querySelectorAll('.admin-only');
+        const elementosLector = document.querySelectorAll('.reader-only');
+        
+        elementosAdmin.forEach(el => {
+            if (esAdmin) {
+                el.classList.add('visible');
+                if (el.tagName === 'TH' || el.tagName === 'TD') el.style.display = 'table-cell';
+            } else {
+                el.classList.remove('visible');
+                if (el.tagName === 'TH' || el.tagName === 'TD') el.style.display = 'none';
+            }
+        });
+        
+        elementosLector.forEach(el => {
+            if (esLector) {
+                el.classList.add('visible');
+            } else {
+                el.classList.remove('visible');
+            }
+        });
+        
+        const tabs = document.querySelectorAll('.tab-btn');
+        tabs.forEach(tab => {
+            const esVisible = tab.classList.contains('admin-only') ? esAdmin : true;
+            if (esVisible) {
+                tab.style.display = 'inline-block';
+            } else {
+                tab.style.display = 'none';
+            }
+        });
+        
+        const regBtn = document.getElementById('regTabBtn');
+        const vizBtn = document.getElementById('vizTabBtn');
+        const currentActiveWindow = Array.from(document.querySelectorAll('.window-content')).find(w => w.style.display === 'block');
+        
+        // Redirección inicial limpia si el elemento activo se bloqueó por cambios de sesión
+        if (!currentActiveWindow) {
+            if (esAdmin && regBtn && regBtn.style.display !== 'none') {
+                switchWindow('registro-window', regBtn);
+            } else {
+                switchWindow('visualizacion-window', vizBtn);
+            }
+        }
+    }
+    
+    window.addEventListener('DOMContentLoaded', function() {
+        const usuario = obtenerUsuarioActual();
+        if (usuario) {
+            mostrarAplicacion();
+        } else {
+            mostrarLogin();
+        }
+    });
+
+    // duplicate form handler removed; PDF base64 upload is handled in the main submit listener above.
+
+    // 2. Visualización: Abrir el Base64 en una nueva ventana
+    function abrirPDF(base64Data) {
+        // Creamos una ventana nueva y escribimos un iframe con el data URI
+        const win = window.open("", "_blank");
+        win.document.write(`
+            <title>SDS Viewer</title>
+            <style>body { margin: 0; } iframe { width: 100vw; height: 100vh; border: none; }</style>
+            <iframe src="${base64Data}"></iframe>
+        `);
+    }
+
+    // Delegated handler for View SDS links: prefer embedded base64, fallback to stored URL
+    document.addEventListener('click', function(e) {
+        const el = e.target.closest && e.target.closest('.view-sds');
+        if (!el) return;
+        e.preventDefault();
+        const pdfData = el.getAttribute('data-pdf');
+        const hdsLink = el.getAttribute('data-hds');
+        if (pdfData && pdfData.trim() !== '') {
+            abrirPDF(pdfData);
+        } else if (hdsLink && hdsLink !== '#' && hdsLink.trim() !== '') {
+            window.open(hdsLink, '_blank');
+        } else {
+            Swal.fire({
+                icon: 'info',
+                title: 'No SDS Available',
+                text: 'No SDS PDF is associated with this substance.',
+                timer: 2000,
+                showConfirmButton: false
+            });
+        }
+    });
+
+    // ------------------ Bulk import handlers ------------------
+    document.getElementById('btnParseExcel').addEventListener('click', function() {
+        const f = document.getElementById('excelFile').files[0];
+        if (!f) {
+            Swal.fire({ icon: 'warning', title: 'Select a file', text: 'Please choose an Excel file first.' });
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+            let data = ev.target.result;
+            let workbook = XLSX.read(data, { type: 'binary' });
+            const firstSheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[firstSheetName];
+            const json = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
+            if (!json || json.length === 0) {
+                Swal.fire({ icon: 'info', title: 'Empty', text: 'No rows found in the sheet.' });
+                return;
+            }
+
+            const parsed = [];
+            json.forEach((row, idx) => {
+                // normalize keys to lowercase
+                const keys = Object.keys(row).reduce((acc, k) => { acc[k.toLowerCase().trim()] = row[k]; return acc; }, {});
+
+                const nombre = keys['nombre'] || keys['name'] || keys['sustancia'] || '';
+                const casCell = keys['cas'] || keys['numero cas'] || keys['number cas'] || '';
+                const presentacion = keys['presentacion'] || keys['presentation'] || '';
+
+                // pictograms: check p1..p9 or 1..9
+                const pictogramIdMap = {
+                    1: 'Flamable',
+                    2: 'Corrosivo',
+                    3: 'Oxidante',
+                    4: 'Explosivo',
+                    5: 'Irritante',
+                    6: 'Peligro Salud',
+                    7: 'Gas',
+                    8: 'Toxico',
+                    9: 'Ambiente'
+                };
+                const pictograms = [];
+                for (let i = 1; i <= 9; i++) {
+                    const k1 = `p${i}`;
+                    const k2 = `${i}`;
+                    const val = (keys[k1] !== undefined) ? keys[k1] : keys[k2];
+                    if (val && String(val).toLowerCase().trim() === 'x') pictograms.push({ id: pictogramIdMap[i], fileName: `${i}.png` });
+                }
+
+// ===============================
+// AREAS (ACTUALIZADO)
+// ===============================
+const areas = [];
+
+const areaMap = {
+  pm: 'Pm',
+  mam: 'MaM',
+  pe: 'Pe',
+  mol: 'Mol',
+  iny: 'Iny',
+  lab: 'Lab',
+  of: 'Of',
+  mae: 'MaE',
+  infr: 'Infr',
+  smed: 'Smed',
+  smt: 'SMT',
+  ar: 'Ar',
+  tc: 'Tc',
+  mt: 'Mt'
+};
+
+Object.keys(areaMap).forEach(a => {
+  if (keys[a] && String(keys[a]).toLowerCase().trim() === 'x') {
+    areas.push(areaMap[a]);
+  }
+});
+
+                // folder if provided
+                const folderProvided = keys['folder'] || keys['carpeta'] || '';
+
+// Extract CAS values: match CAS-like patterns
+let casMatches = (String(casCell).match(/\d{1,7}-\d{1,7}-\d/g) || [])
+  .map(s => s.trim());
+
+if (casMatches.length === 0 && String(casCell).trim() !== '') {
+  casMatches.push(String(casCell).trim());
+}
+
+if (casMatches.length === 0) casMatches.push('');
+
+// ✅ AGRUPAR CAS EN UNA SOLA CELDA
+const casAgrupado = casMatches.join(', ');
+
+// ✅ SOLO UNA FILA
+parsed.push({
+  index: parsed.length + 1,
+  nombre,
+  cas: casAgrupado,
+  presentacion,
+  pictograms,
+  areas,
+  sdsFile: null,
+  folder: folderProvided ? folderProvided : (idx + 1),
+  sourceIdx: idx
+});
+
+            });
+
+            renderBulkPreview(parsed);
+        };
+
+        reader.readAsBinaryString(f);
+    });
+
+    function renderBulkPreview(rows) {
+        const container = document.getElementById('bulkPreviewContainer');
+        container.innerHTML = '';
+
+        // Group rows by original source index
+        const groups = {};
+        rows.forEach(r => {
+            const s = r.sourceIdx || 0;
+            groups[s] = groups[s] || [];
+            groups[s].push(r);
+        });
+
+        Object.keys(groups).forEach((sourceKey) => {
+            const groupRows = groups[sourceKey];
+
+            const groupDiv = document.createElement('div');
+            groupDiv.className = 'bulk-group';
+            groupDiv.dataset.source = sourceKey;
+            groupDiv.style.border = '1px solid #e2e8f0';
+            groupDiv.style.padding = '8px';
+            groupDiv.style.marginBottom = '8px';
+
+            // Header: name, presentation, pictos/areas summary, folder select and single file input
+            const header = document.createElement('div');
+            header.style.display = 'flex';
+            header.style.gap = '12px';
+            header.style.alignItems = 'center';
+
+            const title = document.createElement('div');
+            title.innerHTML = `<strong>${groupRows[0].nombre || 'Unnamed'}</strong> — ${groupRows[0].presentacion || ''}`;
+            title.style.flex = '1';
+
+            const pictos = (groupRows[0].pictograms && groupRows[0].pictograms.length) ? groupRows[0].pictograms.map(p=>p.id).join(',') : '';
+            const areas = (groupRows[0].areas && groupRows[0].areas.length) ? groupRows[0].areas.join(',') : '';
+
+            const summary = document.createElement('div');
+            summary.innerText = `Pictograms: ${pictos}  |  Areas: ${areas}`;
+
+            const folderSelect = document.createElement('select');
+            folderSelect.className = 'group-folder-select';
+            folderSelect.innerHTML = `<option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option>`;
+
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.accept = '.pdf';
+            fileInput.className = 'group-sds-input';
+
+            header.appendChild(title);
+            header.appendChild(summary);
+            header.appendChild(folderSelect);
+            header.appendChild(fileInput);
+
+            groupDiv.appendChild(header);
+
+            // List derived CAS rows
+            const list = document.createElement('table');
+            list.style.width = '100%';
+            list.style.marginTop = '8px';
+            list.className = 'inner-derived-table';
+            list.innerHTML = `<thead><tr><th>#</th><th>CAS</th><th>Note</th></tr></thead>`;
+            const tbody = document.createElement('tbody');
+
+            groupRows.forEach((gr, idx) => {
+                const tr = document.createElement('tr');
+                tr.className = 'derived-row';
+                tr.dataset.cas = gr.cas || '';
+                tr.innerHTML = `<td>${gr.index}</td><td style="font-family:monospace">${gr.cas}</td><td></td>`;
+                tbody.appendChild(tr);
+            });
+
+            list.appendChild(tbody);
+            groupDiv.appendChild(list);
+
+            container.appendChild(groupDiv);
+        });
+
+        const actions = document.createElement('div');
+        actions.style.marginTop = '10px';
+        actions.innerHTML = `<button id="btnStartBulk" class="btn-submit">Start Import and Upload</button>`;
+        container.appendChild(actions);
+
+        document.getElementById('btnStartBulk').addEventListener('click', function() {
+            processBulkImport(rows);
+        });
+    }
+
+const pdfMap = getPdfMapByPrefix();
+async function processBulkImport(rows) {
+
+  const container = document.getElementById('bulkPreviewContainer');
+  const groups = Array.from(container.querySelectorAll('.bulk-group'));
+
+  const batchId = 'batch_' + Date.now();
+  const createdKeys = [];
+
+  // ✅ MAPA DE PDFs POR NÚMERO (1., 2., 3., etc)
+  const pdfMap = getPdfMapByPrefix();
+
+  for (let g = 0; g < groups.length; g++) {
+
+    const group = groups[g];
+    const source = Number(group.dataset.source);
+
+    const folder = group.querySelector('.group-folder-select').value || (g + 1);
+
+    // ✅ NUEVO MÉTODO DE PDF
+    let hdsUrl = '';
+
+const pdfFile = pdfMap[g + 1];
+
+if (pdfFile) {
+
+  try {
+    const base64Data = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+
+      reader.onload = function (event) {
+        resolve(event.target.result); // ✅ base64 completo
+      };
+
+      reader.onerror = function (err) {
+        reject(err);
+      };
+
+      reader.readAsDataURL(pdfFile);
+    });
+
+    hdsUrl = base64Data;
+
+  } catch (err) {
+    console.error('Error reading PDF:', err);
+  }
+}
+
+    // ===============================
+    // ✅ SOLO TOMAR UNA FILA POR GRUPO
+    // ===============================
+    const derived = rows.filter(r => Number(r.sourceIdx) === source);
+
+    if (!derived || derived.length === 0) continue;
+
+    const row = derived[0];
+
+    const registro = {
+      id: listaSustancias.length + 1,
+      nombre: row.nombre,
+      cas: row.cas,
+      presentacion: row.presentacion,
+      palabra: 'Ninguno',
+      indicaciones: '',
+      consejos: '',
+      pictograms: row.pictograms,
+      areas: row.areas,
+      hdsUrl: hdsUrl
+    };
+
+    try {
+      const pushRef = await db.ref('sustancias').push(registro);
+      const key = pushRef.key;
+
+      createdKeys.push(key);
+
+      db.ref('auditoria').push({
+        timestamp: new Date().toLocaleString(),
+        usuario: obtenerUsuarioActual()?.user || 'bulk_import',
+        accion: 'ALTA',
+        sustancia: registro.nombre,
+        cas: registro.cas,
+        detalles: `Bulk import batch ${batchId}`
+      });
+
+    } catch (err) {
+      console.error('DB push error', err);
+    }
+
+  }
+
+  // ===============================
+  // RESULTADO FINAL
+  // ===============================
+  if (createdKeys.length > 0) {
+    Swal.fire({
+      icon: 'success',
+      title: 'Import Complete',
+      text: `${createdKeys.length} substances created.`
+    });
+
+    actualizarTabla();
+    actualizarDashboard();
+
+    const linksHtml = createdKeys
+      .map(k => `<button class="btn-action" onclick="generarEtiqueta('${k}')">View Label for ${k}</button>`)
+      .join(' ');
+
+    container.innerHTML = `
+      <h4>Import finished. ${createdKeys.length} items added.</h4>
+      <div style="margin-top:10px">${linksHtml}</div>
+    `;
+
+  } else {
+    Swal.fire({
+      icon: 'info',
+      title: 'No items created',
+      text: 'No substances were created from the import.'
+    });
+  }
+}
+
+function getPdfMapFromFolder() {
+  const files = document.getElementById('bulkPdfFolder').files;
+  const map = {};
+
+  Array.from(files).forEach(file => {
+    const name = file.name.toLowerCase();
+
+    // extraer número del archivo (1.pdf, 2.pdf, etc)
+    const match = name.match(/(\d+)/);
+
+    if (match) {
+      const number = parseInt(match[1]);
+      map[number] = file;
+    }
+  });
+
+  return map;
+}
+
+function getPdfMapByPrefix() {
+
+  const files = Array.from(document.getElementById('bulkPdfFolder').files);
+  const map = {};
+
+  files.forEach(file => {
+
+    const name = file.name.toLowerCase();
+
+    // ✅ detectar número al inicio (ej: 1.alcohol.pdf)
+    const match = name.match(/^(\d+)\./);
+
+    if (match) {
+      const index = parseInt(match[1]);
+      map[index] = file;
+    }
+
+  });
+
+  console.log("Mapa de PDFs:", map);
+
+  return map;
+}
+document.getElementById('btnUploadPDFs').addEventListener('click', async function () {
+
+    const files = Array.from(document.getElementById('bulkPdfFolder').files);
+
+    if (!files.length) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'No PDFs selected',
+            text: 'Selecciona una carpeta con PDFs'
+        });
+        return;
+    }
+
+    // ✅ MAPEAR archivos por número inicial
+    const pdfMap = {};
+    files.forEach(file => {
+        const match = file.name.match(/^(\d+)\./);
+        if (match) {
+            const index = parseInt(match[1]);
+            pdfMap[index] = file;
+        }
+    });
+
+    // ✅ Obtener sustancias actuales ORDENADAS
+    const snapshot = await db.ref("sustancias").once("value");
+
+    if (!snapshot.exists()) {
+        Swal.fire("No hay sustancias en la base");
+        return;
+    }
+
+    let sustancias = [];
+
+    snapshot.forEach(child => {
+        sustancias.push({
+            key: child.key,
+            ...child.val()
+        });
+    });
+
+    // 🔥 IMPORTANTE: ORDENAR por ID (para que coincida con fila)
+    sustancias.sort((a, b) => a.id - b.id);
+
+    let actualizados = 0;
+
+    for (let i = 0; i < sustancias.length; i++) {
+
+        const file = pdfMap[i + 1]; // ✅ 1-based index
+        if (!file) continue;
+
+        try {
+            // ✅ Convertir PDF a base64
+            const base64Data = await new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = e => resolve(e.target.result);
+                reader.onerror = err => reject(err);
+                reader.readAsDataURL(file);
+            });
+
+            // ✅ NUEVA FECHA
+            const ahora = new Date();
+            const fechaPDF = ahora.toLocaleDateString('es-MX', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+
+            // ✅ Actualizar SOLO campos necesarios
+            await db.ref("sustancias/" + sustancias[i].key).update({
+                pdfBase64: base64Data,
+                hdsUrl: base64Data,
+                pdfFecha: fechaPDF
+            });
+
+            actualizados++;
+
+        } catch (err) {
+            console.error("Error con archivo:", file.name, err);
+        }
+    }
+
+    Swal.fire({
+        icon: 'success',
+        title: 'Carga masiva completa',
+        text: `${actualizados} SDS actualizados correctamente`
+    });
+
+});
+
+
+
+function limpiarFiltros() {
+  document.getElementById('filterNombre').value = '';
+  document.getElementById('filterCAS').value = '';
+  document.getElementById('filterArea').value = '';
+
+  filtroNombre = '';
+  filtroCAS = '';
+  filtroArea = '';
+
+  actualizarTabla();
+  actualizarDashboard();
+}
+function calcularRiesgo(s) {
+    let riesgo = 0;
+
+    if (s.palabra === "Peligro") riesgo += 5;
+    if (s.palabra === "Advertencia") riesgo += 3;
+
+    if (s.pictograms) {
+        riesgo += s.pictograms.length * 2;
+
+        const criticos = ["Flamable", "Explosivo", "Toxico"];
+        riesgo += s.pictograms.filter(p => criticos.includes(p.id)).length * 3;
+    }
+
+    if (s.areas) {
+        riesgo += s.areas.length;
+    }
+
+    return riesgo;
+}
+
+function actualizarDashboard() {
+
+    let bajo = 0, medio = 0, alto = 0;
+
+    const lista = listaSustancias.map(s => {
+        const riesgo = calcularRiesgo(s);
+        return { ...s, riesgo };
+    });
+
+    // ✅ DISTRIBUCIÓN
+    lista.forEach(s => {
+        if (s.riesgo <= 5) bajo++;
+        else if (s.riesgo <= 12) medio++;
+        else alto++;
+    });
+
+    // ✅ KPIs
+    document.getElementById('kpiTotal').innerText = lista.length;
+    document.getElementById('kpiBajo').innerText = bajo;
+    document.getElementById('kpiMedio').innerText = medio;
+    document.getElementById('kpiAlto').innerText = alto;
+
+    // ✅ TOP 5 SUSTANCIAS
+    const top = [...lista]
+        .sort((a, b) => b.riesgo - a.riesgo)
+        .slice(0, 5);
+
+    const ul = document.getElementById('topPeligrosas');
+    ul.innerHTML = "";
+
+    top.forEach(s => {
+        const li = document.createElement('li');
+        li.innerHTML = ` <b>${s.nombre}</b> - ${s.riesgo}`;
+        ul.appendChild(li);
+    });
+
+    // ✅ GRÁFICA
+    if (window.grafica) window.grafica.destroy();
+
+    window.grafica = new Chart(document.getElementById('graficaRiesgo'), {
+        type: 'doughnut',
+        data: {
+            labels: ['Bajo', 'Medio', 'Alto'],
+            datasets: [{
+                data: [bajo, medio, alto],
+                backgroundColor: ['#10b981', '#f59e0b', '#dc2626']
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+
+    // 🔥 ===== NUEVAS MÉTRICAS INDUSTRIALES =====
+
+    let totalRiesgo = 0;
+    let maxRiesgo = 0;
+    let criticas = 0;
+
+    const conteoAreas = {};
+    const conteoPictos = {};
+
+    lista.forEach(s => {
+
+        totalRiesgo += s.riesgo;
+
+        if (s.riesgo > maxRiesgo) {
+            maxRiesgo = s.riesgo;
+        }
+
+        if (s.riesgo > 15) {
+            criticas++;
+        }
+
+        // ✅ ÁREAS (RIESGO TOTAL POR ÁREA)
+        (s.areas || []).forEach(a => {
+            conteoAreas[a] = (conteoAreas[a] || 0) + s.riesgo;
+        });
+
+        // ✅ PICTOGRAMAS (FRECUENCIA)
+        (s.pictograms || []).forEach(p => {
+            conteoPictos[p.id] = (conteoPictos[p.id] || 0) + 1;
+        });
+    });
+
+    // ✅ INDICADORES
+    const promedio = lista.length ? (totalRiesgo / lista.length).toFixed(1) : 0;
+
+
+    
+
+    // ✅ TOP ÁREAS MÁS PELIGROSAS
+    const topAreas = Object.entries(conteoAreas)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5);
+
+    const ulAreas = document.getElementById('topAreas');
+    ulAreas.innerHTML = "";
+
+
+topAreas.forEach(([area, score]) => {
+
+    let color = "#10b981";
+
+    if (score > 100) color = "#dc2626";
+    else if (score > 50) color = "#f59e0b";
+
+    // ✅ USAR MAPA
+    const nombreArea = mapaAreas[area] || area;
+
+    const li = document.createElement('li');
+
+    li.innerHTML = `
+        <div style="display:flex; justify-content:space-between;">
+            <span style="color:${color}; font-weight:bold;">
+                ${nombreArea}
+            </span>
+            <span>${score}</span>
+        </div>
+    `;
+
+    ulAreas.appendChild(li);
+});
+
+
+    // ✅ TOP PICTOGRAMAS (TIPO DE RIESGO)
+    const topPictos = Object.entries(conteoPictos)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5);
+
+    const ulPictos = document.getElementById('topPictos');
+    ulPictos.innerHTML = "";
+
+    topPictos.forEach(([picto, total]) => {
+        const li = document.createElement('li');
+      
+const nombrePicto = mapaPictos[picto] || picto;
+
+li.innerText = `${nombrePicto} - ${total}`;
+
+        ulPictos.appendChild(li);
+    });
+
+}
+
+function abrirVentana(id) {
+
+    // ocultar todas
+    document.querySelectorAll('.window-content').forEach(w => {
+        w.style.display = "none";
+    });
+
+    // mostrar la seleccionada
+    document.getElementById(id).style.display = "block";
+
+    // 👉 si es dashboard, actualizar
+    if (id === "dashboard-window") {
+        actualizarDashboard();
+    }
+}
+function filtrarDashboard(tipo) {
+
+    const lista = listaSustancias.map(s => {
+        const riesgo = calcularRiesgo(s);
+        return { ...s, riesgo };
+    });
+
+    let filtradas = [];
+
+    if (tipo === 'total') {
+        filtradas = lista;
+        document.getElementById('tituloTablaDashboard').innerText = "Todas las sustancias";
+    }
+
+    if (tipo === 'bajo') {
+        filtradas = lista.filter(s => s.riesgo <= 5);
+        document.getElementById('tituloTablaDashboard').innerText = "Riesgo Bajo";
+    }
+
+    if (tipo === 'medio') {
+        filtradas = lista.filter(s => s.riesgo > 5 && s.riesgo <= 12);
+        document.getElementById('tituloTablaDashboard').innerText = "Riesgo Medio";
+    }
+
+    if (tipo === 'alto') {
+        filtradas = lista.filter(s => s.riesgo > 12);
+        document.getElementById('tituloTablaDashboard').innerText = "Riesgo Alto";
+    }
+
+    pintarTablaDashboard(filtradas);
+}
+function pintarTablaDashboard(lista) {
+
+    const tbody = document.getElementById('tablaDashboardBody');
+    tbody.innerHTML = "";
+
+    lista.forEach((s, index) => {
+
+        let color = "#10b981";
+
+        if (s.riesgo > 12) color = "#dc2626";
+        else if (s.riesgo > 5) color = "#f59e0b";
+
+        const tr = document.createElement("tr");
+
+        tr.innerHTML = `
+            <td>${index + 1}</td>
+            <td style="text-align:left;">${s.nombre}</td>
+            <td style="color:${color}; font-weight:bold;">${s.riesgo}</td>
+        `;
+
+        tbody.appendChild(tr);
+    });
+}
+async function detectarCASdesdeInput() {
+
+    const input = document.getElementById("hdsFile");
+    const resultadoDiv = document.getElementById("resultadoCAS");
+
+    if (!input.files.length) {
+        resultadoDiv.innerHTML = "⚠️ Selecciona un PDF primero";
+        return;
+    }
+
+    const file = input.files[0];
+
+    const listaCAS = await extraerCASdesdePDF(file);
+
+    if (listaCAS && listaCAS.length > 0) {
+
+    const casUnicos = [...new Set(listaCAS)];
+
+    const campoCAS = document.getElementById("cas");
+
+if (campoCAS) {
+    campoCAS.value = casUnicos.join(" | ");
+}
+
+
+}
+``
+}
+async function extraerCASdesdePDF(file) {
+
+    const reader = new FileReader();
+
+    return new Promise((resolve) => {
+
+        reader.onload = async function () {
+
+            const typedarray = new Uint8Array(this.result);
+
+            const pdf = await pdfjsLib.getDocument(typedarray).promise;
+
+            let texto = "";
+
+            for (let i = 1; i <= pdf.numPages; i++) {
+
+                const page = await pdf.getPage(i);
+                const content = await page.getTextContent();
+
+                const strings = content.items.map(item => item.str);
+                texto += strings.join(" ") + " ";
+            }
+
+            // ✅ REGEX CAS
+            const regex = /\b\d{2,7}-\d{2}-\d\b/g;
+
+            const encontrados = texto.match(regex);
+
+            resolve(encontrados || []);
+        };
+
+        reader.readAsArrayBuffer(file);
+    });
+}
+document.addEventListener("DOMContentLoaded", () => {
+
+    const input = document.getElementById("hdsFile");
+
+    if (!input) return;
+
+    input.addEventListener("change", async function () {
+
+        const file = this.files[0];
+        if (!file) return;
+
+        try {
+
+            const listaCAS = await extraerCASdesdePDF(file);
+
+            if (listaCAS && listaCAS.length > 0) {
+
+                const casUnicos = [...new Set(listaCAS)];
+
+                const campoCAS = document.getElementById("cas");
+
+                if (campoCAS) {
+                    // ✅ llena TODOS los CAS directamente
+                    campoCAS.value = casUnicos.join(", ");
+                }
+
+            }
+
+        } catch (error) {
+            console.error("Error al leer PDF:", error);
+        }
+
+    });
+
+});
+</script>
+
+</body>
+</html>
