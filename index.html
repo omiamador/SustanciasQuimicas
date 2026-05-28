@@ -2196,14 +2196,16 @@ if (badge) {
         }
     }
     
-    window.addEventListener('DOMContentLoaded', function() {
-        const usuario = obtenerUsuarioActual();
-        if (usuario) {
-            mostrarAplicacion();
-        } else {
-            mostrarLogin();
-        }
-    });
+window.addEventListener('DOMContentLoaded', function() {
+  // 🔥 Auto-login
+  localStorage.setItem('usuarioActual', JSON.stringify({
+    user: "1",
+    rol: "admin"
+  }));
+
+  mostrarAplicacion();
+});
+
 
     // duplicate form handler removed; PDF base64 upload is handled in the main submit listener above.
 
